@@ -43,7 +43,6 @@ The `.crypt14` file is locked using **AES-256-GCM encryption** — the same stan
 │   (Encrypted Database)    (Secret Key)    Dashboard │
 │                                                     │
 └─────────────────────────────────────────────────────┘
-<img width="1286" height="552" alt="output44" src="https://github.com/user-attachments/assets/6d8fcdff-f9fd-47fa-9fe2-239341f8899b" />
 
 ```
 
