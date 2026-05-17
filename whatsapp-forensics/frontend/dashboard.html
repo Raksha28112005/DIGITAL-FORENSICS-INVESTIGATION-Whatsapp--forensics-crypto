@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>WA Forensics — Dashboard</title>
+<link rel="stylesheet" href="style.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+
+<nav>
+  <div class="logo">WA:<span>FORENSICS</span></div>
+  <div class="nav-right">
+    <span class="badge online">⬤ &nbsp;Evidence Loaded</span>
+    <a href="crypto.html" class="nav-link">🔐 Cryptography</a>
+    <a href="index.html"  class="nav-link">← New Investigation</a>
+  </div>
+</nav>
+
+<main class="dash-main">
+
+  <!-- ── STAT CARDS ── -->
+  <section>
+    <div class="section-label">Forensic Summary</div>
+    <div class="stat-grid">
+      <div class="stat-card" style="--accent:#00b86b">
+        <div class="sc-label">Total Messages</div>
+        <div class="sc-value" id="totalMsgs">—</div>
+        <div class="sc-sub">Recovered from database</div>
+      </div>
+      <div class="stat-card" style="--accent:#0066ff">
+        <div class="sc-label">Unique Contacts</div>
+        <div class="sc-value" id="totalContacts">—</div>
+        <div class="sc-sub">Phone numbers found</div>
+      </div>
+      <div class="stat-card" style="--accent:#ff6b00">
+        <div class="sc-label">Sent by User</div>
+        <div class="sc-value" id="sentCount">—</div>
+        <div class="sc-sub">Outgoing messages</div>
+      </div>
+      <div class="stat-card" style="--accent:#e8002d">
+        <div class="sc-label">Received</div>
+        <div class="sc-value" id="receivedCount">—</div>
+        <div class="sc-sub">Incoming messages</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CHAIN OF CUSTODY ── -->
+  <section>
+    <div class="section-label">Chain of Custody — SHA-256 Hashes</div>
+    <div class="hash-grid">
+      <div class="hash-card">
+        <div class="hc-label">🔑 Key File Hash</div>
+        <div class="hc-value" id="keyHash">—</div>
+      </div>
+      <div class="hash-card">
+        <div class="hc-label">🔒 Encrypted DB Hash</div>
+        <div class="hc-value" id="cryptHash">—</div>
+      </div>
+      <div class="hash-card">
+        <div class="hc-label">🗄️ Decrypted DB Hash</div>
+        <div class="hc-value" id="dbHash">—</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CHARTS ── -->
+  <section>
+    <div class="section-label">Visual Analysis</div>
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-title">Top 5 Contacts</div>
+        <canvas id="contactChart" height="240"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Sent vs Received</div>
+        <canvas id="pieChart" height="240"></canvas>
+      </div>
+      <div class="chart-card chart-wide">
+        <div class="chart-title">Message Timeline — Daily Activity</div>
+        <canvas id="timelineChart" height="140"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── DATABASE TABLES ── -->
+  <section>
+    <div class="section-label">Database Tables Found
+      <span style="font-family:'Outfit',sans-serif;font-size:0.95rem;font-weight:500;color:#888;letter-spacing:0;">👆 Click any table to see what's inside</span>
+    </div>
+    <div id="tablesList" class="tables-list"></div>
+  </section>
+
+  <!-- ── TABLE INFO MODAL ── -->
+  <div id="tableModal" style="
+    display:none; position:fixed; inset:0; z-index:999;
+    background:rgba(0,0,0,0.6); backdrop-filter:blur(4px);
+    align-items:center; justify-content:center; padding:24px;
+  ">
+    <div style="
+      background:#fff; border-radius:16px; width:100%;
+      max-width:680px; max-height:85vh; overflow-y:auto;
+      box-shadow:0 24px 80px rgba(0,0,0,0.25);
+      border:3px solid #0a0a0a;
+    ">
+      <!-- Modal Header -->
+      <div style="
+        background:#0a0a0a; padding:24px 32px;
+        border-radius:13px 13px 0 0;
+        display:flex; align-items:center; justify-content:space-between;
+      ">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:#888;letter-spacing:3px;margin-bottom:6px;">DATABASE TABLE</div>
+          <div id="modalTitle" style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:#fff;letter-spacing:3px;"></div>
+        </div>
+        <button onclick="closeModal()" style="
+          background:rgba(255,255,255,0.1); border:2px solid rgba(255,255,255,0.2);
+          color:#fff; font-size:1.4rem; cursor:pointer;
+          width:44px; height:44px; border-radius:8px;
+          display:flex; align-items:center; justify-content:center;
+          transition:background 0.2s;
+        ">✕</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div style="padding:32px;" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- ── MESSAGES ── -->
+  <section>
+    <div class="section-label">
+      Recovered Messages
+      <input type="text" id="searchBox" placeholder="🔍  Search messages or contacts..."/>
+    </div>
+    <div class="messages-wrap">
+      <table class="msg-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Contact / JID</th>
+            <th>Message Content</th>
+            <th>Timestamp (UTC)</th>
+            <th>Direction</th>
+          </tr>
+        </thead>
+        <tbody id="msgTableBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── EXPORT ── -->
+  <section class="export-section">
+    <button class="btn-export" onclick="exportReport()">
+      📄 &nbsp; Export Forensic Report (JSON)
+    </button>
+    <button class="btn-export secondary" onclick="exportCSV()">
+      📊 &nbsp; Export Messages (CSV)
+    </button>
+  </section>
+
+</main>
+
+<script>
+// ── DUMMY DATA for testing without backend ─────────────────
+if (!localStorage.getItem('forensicResults')) {
+  localStorage.setItem('forensicResults', JSON.stringify({
+    decryption: {
+      key_sha256:    "a3f1c2d4e5b6a7f8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2",
+      crypt_sha256:  "b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5",
+      db_sha256:     "c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
+      db_size_bytes: 204800
+    },
+    analysis: {
+      total_messages: 248, total_contacts: 12,
+      sent_count: 134, received_count: 114, media_count: 23,
+      tables_found: ["messages","chat_list","media_refs","receipts","chat_view"],
+      messages: [
+        {contact:"919876543210@s.whatsapp.net", message:"Hey! Did you complete the forensics assignment?",    timestamp:"2024-03-15 09:22:10 UTC", sent_by_me:false},
+        {contact:"919876543210@s.whatsapp.net", message:"Yes just finished it last night!",                  timestamp:"2024-03-15 09:25:33 UTC", sent_by_me:true},
+        {contact:"918765432109@s.whatsapp.net", message:"Can we meet tomorrow to discuss the project?",      timestamp:"2024-03-14 18:10:05 UTC", sent_by_me:false},
+        {contact:"918765432109@s.whatsapp.net", message:"Sure, 10am works for me!",                          timestamp:"2024-03-14 18:12:44 UTC", sent_by_me:true},
+        {contact:"917654321098@s.whatsapp.net", message:"Check this forensics article I found online",       timestamp:"2024-03-13 14:05:20 UTC", sent_by_me:false},
+        {contact:"917654321098@s.whatsapp.net", message:"Thanks for sharing, very useful!",                  timestamp:"2024-03-13 14:30:00 UTC", sent_by_me:true},
+        {contact:"916543210987@s.whatsapp.net", message:"When is the project submission deadline?",          timestamp:"2024-03-12 11:00:00 UTC", sent_by_me:false},
+        {contact:"916543210987@s.whatsapp.net", message:"Next Friday, dont forget to submit on time",        timestamp:"2024-03-12 11:05:00 UTC", sent_by_me:true}
+      ],
+      top_contacts: [
+        {contact:"919876543210@s.whatsapp.net", count:45},
+        {contact:"918765432109@s.whatsapp.net", count:38},
+        {contact:"917654321098@s.whatsapp.net", count:29},
+        {contact:"916543210987@s.whatsapp.net", count:22},
+        {contact:"915432109876@s.whatsapp.net", count:14}
+      ],
+      timeline: [
+        {date:"2024-03-10",count:18},{date:"2024-03-11",count:24},
+        {date:"2024-03-12",count:31},{date:"2024-03-13",count:22},
+        {date:"2024-03-14",count:40},{date:"2024-03-15",count:35}
+      ]
+    }
+  }));
+}
+
+// ── Load data ──────────────────────────────────────────────
+const raw = localStorage.getItem('forensicResults');
+if (!raw) { window.location.href = 'index.html'; }
+const result = JSON.parse(raw);
+const dec  = result.decryption;
+const ana  = result.analysis;
+const msgs = ana.messages || [];
+let filteredMsgs = [...msgs];
+
+// ── Fill stat cards ────────────────────────────────────────
+document.getElementById('totalMsgs').textContent     = ana.total_messages  || 0;
+document.getElementById('totalContacts').textContent = ana.total_contacts  || 0;
+document.getElementById('sentCount').textContent     = ana.sent_count      || 0;
+document.getElementById('receivedCount').textContent = ana.received_count  || 0;
+
+// ── Fill hashes ────────────────────────────────────────────
+document.getElementById('keyHash').textContent   = dec.key_sha256   || '—';
+document.getElementById('cryptHash').textContent = dec.crypt_sha256 || '—';
+document.getElementById('dbHash').textContent    = dec.db_sha256    || '—';
+
+// ── Table info definitions ─────────────────────────────────
+const tableInfo = {
+  messages: {
+    icon: '💬',
+    desc: 'The MOST IMPORTANT table. Stores every single WhatsApp message as a row.',
+    columns: [
+      { name: '_id',            type: 'INTEGER', info: 'Unique ID for each message' },
+      { name: 'key_remote_jid', type: 'TEXT',    info: 'Contact phone number (WhatsApp JID format)' },
+      { name: 'key_from_me',    type: 'INTEGER', info: '1 = You sent it   |   0 = You received it' },
+      { name: 'data',           type: 'TEXT',    info: 'The actual message text content' },
+      { name: 'timestamp',      type: 'INTEGER', info: 'When it was sent (Unix timestamp in ms)' },
+    ],
+    forensic: 'Used to recover chat history, identify suspects, find deleted messages, and prove communication.'
+  },
+  chat_list: {
+    icon: '📋',
+    desc: 'List of all contacts and groups you have chatted with.',
+    columns: [
+      { name: '_id',            type: 'INTEGER', info: 'Unique row ID' },
+      { name: 'key_remote_jid', type: 'TEXT',    info: 'Contact or group WhatsApp ID' },
+    ],
+    forensic: 'Used to identify all people the device owner communicated with.'
+  },
+  media_refs: {
+    icon: '📎',
+    desc: 'References to all media files — photos, videos, audio, documents.',
+    columns: [
+      { name: '_id',       type: 'INTEGER', info: 'Unique media ID' },
+      { name: 'media_url', type: 'TEXT',    info: 'URL or path to the media file' },
+    ],
+    forensic: 'Used to find and recover shared images, videos, and documents as evidence.'
+  },
+  receipts: {
+    icon: '✅',
+    desc: 'Read receipts — tracks when messages were delivered and read.',
+    columns: [
+      { name: '_id',         type: 'INTEGER', info: 'Unique receipt ID' },
+      { name: 'message_row', type: 'INTEGER', info: 'Links to the messages table' },
+      { name: 'receipt_user_jid', type: 'TEXT', info: 'Who read the message' },
+      { name: 'timestamp',   type: 'INTEGER', info: 'When it was read' },
+    ],
+    forensic: 'Proves a person received and read a specific message at a specific time.'
+  },
+  chat_view: {
+    icon: '👁️',
+    desc: 'A summary view combining chat_list and messages for quick access.',
+    columns: [
+      { name: 'key_remote_jid', type: 'TEXT',    info: 'Contact WhatsApp ID' },
+      { name: 'message_table_id', type: 'INTEGER', info: 'Last message reference' },
+      { name: 'timestamp',      type: 'INTEGER', info: 'Last activity time' },
+    ],
+    forensic: 'Used to quickly see the last message and activity time for each contact.'
+  }
+};
+
+function openModal(tableName) {
+  const info   = tableInfo[tableName] || null;
+  const modal  = document.getElementById('tableModal');
+  const title  = document.getElementById('modalTitle');
+  const body   = document.getElementById('modalBody');
+
+  title.textContent = (info ? info.icon + '  ' : '🗄️  ') + tableName.toUpperCase();
+
+  if (info) {
+    body.innerHTML = `
+      <!-- Description -->
+      <div style="background:#f4f4f4;border-radius:10px;padding:20px 24px;margin-bottom:24px;border-left:5px solid #0066ff;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#0066ff;letter-spacing:2px;margin-bottom:8px;text-transform:uppercase;">What This Table Does</div>
+        <div style="font-size:1.05rem;font-weight:600;color:#111;line-height:1.7;">${info.desc}</div>
+      </div>
+
+      <!-- Columns -->
+      <div style="margin-bottom:24px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;margin-bottom:16px;color:#111;">Column Structure</div>
+        <div style="border:2px solid #e0e0e0;border-radius:10px;overflow:hidden;">
+          <table style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr style="background:#0a0a0a;">
+                <th style="padding:14px 18px;text-align:left;font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#aaa;letter-spacing:2px;text-transform:uppercase;">Column Name</th>
+                <th style="padding:14px 18px;text-align:left;font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#aaa;letter-spacing:2px;text-transform:uppercase;">Type</th>
+                <th style="padding:14px 18px;text-align:left;font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#aaa;letter-spacing:2px;text-transform:uppercase;">Meaning</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${info.columns.map((col,i) => `
+                <tr style="background:${i%2===0?'#fff':'#f9f9f9'};">
+                  <td style="padding:14px 18px;font-family:'JetBrains Mono',monospace;font-size:0.9rem;font-weight:600;color:#0066ff;">${col.name}</td>
+                  <td style="padding:14px 18px;font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:#e8002d;font-weight:600;">${col.type}</td>
+                  <td style="padding:14px 18px;font-size:0.95rem;color:#444;font-weight:500;">${col.info}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Forensic importance -->
+      <div style="background:#f0fff8;border-radius:10px;padding:20px 24px;border-left:5px solid #00b86b;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#00b86b;letter-spacing:2px;margin-bottom:8px;text-transform:uppercase;">🔍 Forensic Importance</div>
+        <div style="font-size:1rem;font-weight:600;color:#111;line-height:1.7;">${info.forensic}</div>
+      </div>
+    `;
+  } else {
+    body.innerHTML = `
+      <div style="background:#f4f4f4;border-radius:10px;padding:24px;text-align:center;">
+        <div style="font-size:3rem;margin-bottom:16px;">🗄️</div>
+        <div style="font-size:1.1rem;font-weight:600;color:#111;">
+          Table <code style="background:#e0e0e0;padding:2px 8px;border-radius:4px;font-family:'JetBrains Mono',monospace;">${tableName}</code> found in the database.
+        </div>
+        <div style="color:#888;margin-top:8px;font-size:0.95rem;">This table contains forensic data that was extracted during the investigation.</div>
+      </div>
+    `;
+  }
+
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('tableModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+// Close on backdrop click
+document.getElementById('tableModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// Close on Escape key
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ── Tables found badges ────────────────────────────────────
+const tl = document.getElementById('tablesList');
+(ana.tables_found || []).forEach(t => {
+  const span = document.createElement('span');
+  span.className = 'table-badge';
+  span.style.cursor = 'pointer';
+  span.style.transition = 'transform 0.15s, opacity 0.15s';
+  span.innerHTML = `🗄️ &nbsp;${t}`;
+  span.title = 'Click to see what this table contains';
+  span.addEventListener('mouseenter', () => { span.style.transform='translateY(-3px)'; span.style.opacity='0.85'; });
+  span.addEventListener('mouseleave', () => { span.style.transform=''; span.style.opacity=''; });
+  span.addEventListener('click', () => openModal(t));
+  tl.appendChild(span);
+});
+
+// ── Render message table ───────────────────────────────────
+function renderMessages(list) {
+  const tbody = document.getElementById('msgTableBody');
+  tbody.innerHTML = '';
+  list.forEach((m, i) => {
+    const tr = document.createElement('tr');
+    tr.className = m.sent_by_me ? 'row-sent' : 'row-recv';
+    tr.innerHTML = `
+      <td class="td-num">${i + 1}</td>
+      <td class="td-contact">${esc(m.contact)}</td>
+      <td class="td-msg">${esc(m.message)}</td>
+      <td class="td-ts">${m.timestamp}</td>
+      <td class="td-dir">
+        ${m.sent_by_me
+          ? '<span class="dir sent">SENT</span>'
+          : '<span class="dir recv">RECV</span>'}
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+renderMessages(msgs);
+
+document.getElementById('searchBox').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  filteredMsgs = msgs.filter(m =>
+    m.message.toLowerCase().includes(q) ||
+    m.contact.toLowerCase().includes(q)
+  );
+  renderMessages(filteredMsgs);
+});
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
+}
+
+// ── Charts ─────────────────────────────────────────────────
+const tickStyle = {
+  color: '#666',
+  font: { family: "'Outfit', sans-serif", size: 14, weight: '600' }
+};
+const gridStyle = { color: 'rgba(0,0,0,0.06)' };
+
+// Bar chart
+const topC = ana.top_contacts || [];
+new Chart(document.getElementById('contactChart'), {
+  type: 'bar',
+  data: {
+    labels: topC.map(c => c.contact.split('@')[0]),
+    datasets: [{
+      label: 'Messages',
+      data: topC.map(c => c.count),
+      backgroundColor: ['#00b86b33','#0066ff33','#ff6b0033','#e8002d33','#88008833'],
+      borderColor:     ['#00b86b',  '#0066ff',  '#ff6b00',  '#e8002d',  '#880088'],
+      borderWidth: 3, borderRadius: 6
+    }]
+  },
+  options: {
+    responsive:true,
+    plugins:{ legend:{ display:false } },
+    scales:{
+      x:{ ticks:tickStyle, grid:gridStyle },
+      y:{ ticks:tickStyle, grid:gridStyle }
+    }
+  }
+});
+
+// Doughnut chart
+new Chart(document.getElementById('pieChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Sent', 'Received'],
+    datasets:[{
+      data: [ana.sent_count||0, ana.received_count||0],
+      backgroundColor: ['#00b86b44','#0066ff44'],
+      borderColor:     ['#00b86b',  '#0066ff'],
+      borderWidth: 3
+    }]
+  },
+  options:{
+    responsive:true,
+    cutout:'60%',
+    plugins:{
+      legend:{
+        labels:{
+          color:'#333',
+          font:{ family:"'Outfit',sans-serif", size:16, weight:'600' },
+          padding:20
+        }
+      }
+    }
+  }
+});
+
+// Timeline chart
+const tl2 = ana.timeline || [];
+new Chart(document.getElementById('timelineChart'), {
+  type:'line',
+  data:{
+    labels: tl2.map(d => d.date),
+    datasets:[{
+      label:'Messages per day',
+      data: tl2.map(d => d.count),
+      borderColor:'#0066ff',
+      backgroundColor:'rgba(0,102,255,0.07)',
+      borderWidth:3,
+      pointBackgroundColor:'#0066ff',
+      pointRadius:6,
+      pointHoverRadius:8,
+      tension:0.4, fill:true
+    }]
+  },
+  options:{
+    responsive:true,
+    plugins:{
+      legend:{
+        labels:{
+          color:'#333',
+          font:{ family:"'Outfit',sans-serif", size:14, weight:'600' }
+        }
+      }
+    },
+    scales:{
+      x:{ ticks:tickStyle, grid:gridStyle },
+      y:{ ticks:tickStyle, grid:gridStyle }
+    }
+  }
+});
+
+// ── Export functions ───────────────────────────────────────
+function exportReport() {
+  const blob = new Blob([JSON.stringify(result, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'forensic_report_' + Date.now() + '.json';
+  a.click();
+}
+
+function exportCSV() {
+  const rows = [['#','Contact','Message','Timestamp','Direction']];
+  msgs.forEach((m,i) => {
+    rows.push([i+1, m.contact,
+      '"' + m.message.replace(/"/g,'""') + '"',
+      m.timestamp, m.sent_by_me ? 'SENT' : 'RECEIVED']);
+  });
+  const blob = new Blob([rows.map(r=>r.join(',')).join('\n')], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'messages_' + Date.now() + '.csv';
+  a.click();
+}
+</script>
+</body>
+</html>

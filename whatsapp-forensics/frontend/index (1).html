@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>WA Forensics — Upload</title>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<nav>
+  <div class="logo">WA:<span>FORENSICS</span></div>
+  <div class="nav-right">
+    <span class="badge" id="apiStatus">⬤ &nbsp;Checking API...</span>
+    <a href="crypto.html"    class="nav-link">🔐 Cryptography</a>
+    <a href="dashboard.html" class="nav-link">Dashboard →</a>
+  </div>
+</nav>
+
+<main class="upload-main">
+
+  <!-- LEFT: Info panel -->
+  <aside class="info-panel">
+    <div class="info-tag">// Digital Forensics Project</div>
+
+    <h1>WhatsApp<br/><span>Investigation</span><br/>Tool</h1>
+
+    <p class="info-desc">
+      Upload your encrypted WhatsApp database and key file.
+      The backend decrypts using <strong>AES-256-GCM</strong>
+      and extracts all forensic evidence from the SQLite database.
+    </p>
+
+    <div class="info-steps">
+      <div class="step">
+        <span class="step-num">01</span>
+        <div>
+          <strong>Upload Key File</strong>
+          <p>The 256-bit AES encryption key stored on the Android device</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">02</span>
+        <div>
+          <strong>Upload .crypt14 File</strong>
+          <p>The encrypted WhatsApp message database backup file</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">03</span>
+        <div>
+          <strong>Decrypt &amp; Analyze</strong>
+          <p>Flask API decrypts and reads all messages from SQLite</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">04</span>
+        <div>
+          <strong>View Evidence</strong>
+          <p>Full forensic report with messages, contacts, and timeline</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="crypto-badge">
+      <span class="cb-label">Encryption</span>
+      <span class="cb-value">AES-256-GCM</span>
+    </div>
+  </aside>
+
+  <!-- RIGHT: Upload panel -->
+  <section class="upload-panel">
+
+    <div class="panel-header">
+      <div class="panel-tag">// Begin Investigation</div>
+      <h2>Upload Evidence Files</h2>
+      <p>Both files are required to begin decryption</p>
+    </div>
+
+    <!-- Key file drop zone -->
+    <div class="drop-zone" id="keyDrop"
+         onclick="document.getElementById('keyInput').click()">
+      <div class="dz-icon">🔑</div>
+      <div class="dz-title">Key File</div>
+      <div class="dz-sub">
+        Click to select — filename must be exactly <code>key</code>
+      </div>
+      <div class="dz-filename" id="keyName">No file selected</div>
+      <input type="file" id="keyInput" hidden
+             onchange="handleFile(this,'key')"/>
+    </div>
+
+    <!-- Crypt14 drop zone -->
+    <div class="drop-zone" id="cryptDrop"
+         onclick="document.getElementById('cryptInput').click()">
+      <div class="dz-icon">🔒</div>
+      <div class="dz-title">.crypt14 Database</div>
+      <div class="dz-sub">
+        Click to select — <code>msgstore.db.crypt14</code>
+      </div>
+      <div class="dz-filename" id="cryptName">No file selected</div>
+      <input type="file" id="cryptInput" hidden
+             onchange="handleFile(this,'crypt')"/>
+    </div>
+
+    <!-- Progress bar -->
+    <div id="progressBox" class="progress-box hidden">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-label" id="progressLabel">Uploading files...</div>
+    </div>
+
+    <!-- Error box -->
+    <div id="errorBox" class="error-box hidden"></div>
+
+    <!-- Submit button -->
+    <button class="btn-analyze" id="analyzeBtn" onclick="startAnalysis()">
+      <span id="btnText">🔓 &nbsp; Decrypt &amp; Analyze</span>
+    </button>
+
+    <p class="disclaimer">
+      ⚠️ For academic and research use only.
+      Only analyze files you own or have legal authorization to investigate.
+    </p>
+
+  </section>
+</main>
+
+<script>
+const API = 'http://localhost:5000';
+let keyFile = null, cryptFile = null;
+
+// Check API status on load
+async function checkAPI() {
+  const el = document.getElementById('apiStatus');
+  try {
+    const res = await fetch(API + '/', {signal: AbortSignal.timeout(3000)});
+    if (res.ok) {
+      el.textContent = '⬤  API Online';
+      el.className = 'badge online';
+    } else throw new Error();
+  } catch {
+    el.textContent = '⬤  API Offline';
+    el.className = 'badge offline';
+  }
+}
+checkAPI();
+
+function handleFile(input, type) {
+  const file = input.files[0];
+  if (!file) return;
+  if (type === 'key') {
+    keyFile = file;
+    document.getElementById('keyName').textContent = '✅  ' + file.name;
+    document.getElementById('keyDrop').classList.add('selected');
+  } else {
+    cryptFile = file;
+    document.getElementById('cryptName').textContent = '✅  ' + file.name;
+    document.getElementById('cryptDrop').classList.add('selected');
+  }
+}
+
+function setProgress(pct, label) {
+  document.getElementById('progressBox').classList.remove('hidden');
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = label;
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorBox');
+  el.textContent = '❌  ' + msg;
+  el.classList.remove('hidden');
+}
+
+async function startAnalysis() {
+  document.getElementById('errorBox').classList.add('hidden');
+
+  if (!keyFile || !cryptFile) {
+    showError('Please upload both the key file and .crypt14 file before proceeding.');
+    return;
+  }
+
+  const btn = document.getElementById('analyzeBtn');
+  btn.disabled = true;
+  document.getElementById('btnText').textContent = '⏳  Processing...';
+  setProgress(20, '📤  Uploading files to Flask API...');
+
+  const formData = new FormData();
+  formData.append('key_file',   keyFile);
+  formData.append('crypt_file', cryptFile);
+
+  try {
+    setProgress(40, '🔓  Decrypting database with AES-256-GCM...');
+    const res  = await fetch(API + '/api/upload', {method:'POST', body:formData});
+    setProgress(70, '🔬  Analyzing SQLite database...');
+    const data = await res.json();
+
+    if (!data.success) throw new Error(data.error || 'Unknown error from API');
+
+    setProgress(95, '✅  Complete! Loading dashboard...');
+    localStorage.setItem('forensicResults', JSON.stringify(data));
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+
+  } catch (err) {
+    document.getElementById('progressBox').classList.add('hidden');
+    showError(err.message.includes('fetch')
+      ? 'Cannot connect to Flask API. Make sure you ran: python app.py'
+      : err.message);
+    btn.disabled = false;
+    document.getElementById('btnText').textContent = '🔓  Decrypt & Analyze';
+  }
+}
+</script>
+</body>
+</html>

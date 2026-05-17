@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>WA Forensics — Cryptography</title>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<nav>
+  <div class="logo">WA:<span>FORENSICS</span></div>
+  <div class="nav-right">
+    <a href="index.html"     class="nav-link">Upload</a>
+    <a href="dashboard.html" class="nav-link">Dashboard</a>
+    <a href="crypto.html"    class="nav-link" style="color:#fff;border-color:rgba(255,255,255,0.3);">Cryptography</a>
+  </div>
+</nav>
+
+<main style="max-width:1100px;margin:0 auto;padding:64px 48px;display:flex;flex-direction:column;gap:72px;">
+
+  <!-- ── HERO ── -->
+  <section style="text-align:center;padding:48px 0 24px;">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:#00b86b;letter-spacing:4px;text-transform:uppercase;margin-bottom:20px;">
+      // Cryptography Module
+    </div>
+    <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,6vw,6rem);letter-spacing:3px;line-height:1;margin-bottom:24px;">
+      How WhatsApp<br/><span style="color:#0066ff;">Encrypts</span> Your Data
+    </h1>
+    <p style="font-size:1.2rem;color:#666;max-width:620px;margin:0 auto;line-height:1.8;font-weight:500;">
+      WhatsApp uses <strong style="color:#111;">AES-256-GCM</strong> encryption —
+      the same standard used by banks, governments, and militaries worldwide.
+      Here's exactly how it works.
+    </p>
+  </section>
+
+  <!-- ── WHAT IS ENCRYPTION ── -->
+  <section>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3px;border-left:6px solid #00b86b;padding-left:20px;margin-bottom:32px;">
+      What is Encryption?
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+      <div style="background:#f4f4f4;border-radius:12px;padding:32px;border:2px solid #e0e0e0;">
+        <div style="font-size:2.5rem;margin-bottom:16px;">🔓</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;margin-bottom:12px;color:#111;">Without Encryption</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:1rem;background:#fff;border:2px solid #e0e0e0;border-radius:8px;padding:16px;color:#111;line-height:2;">
+          "Hey! Meet me at 5pm"
+        </div>
+        <p style="color:#666;margin-top:14px;font-size:1rem;line-height:1.7;">
+          Anyone who intercepts this message can read it directly. No protection at all.
+        </p>
+      </div>
+      <div style="background:#f0fff8;border-radius:12px;padding:32px;border:2px solid #b3f0d4;">
+        <div style="font-size:2.5rem;margin-bottom:16px;">🔒</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;margin-bottom:12px;color:#111;">With AES-256 Encryption</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;background:#fff;border:2px solid #b3f0d4;border-radius:8px;padding:16px;color:#00b86b;line-height:2;word-break:break-all;">
+          a3f8c2d1e4b7a9f0c1d2e3b4a5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3
+        </div>
+        <p style="color:#666;margin-top:14px;font-size:1rem;line-height:1.7;">
+          The same message now looks like random characters. Only someone with the secret key can decode it.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── AES-256 EXPLAINED ── -->
+  <section>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3px;border-left:6px solid #0066ff;padding-left:20px;margin-bottom:32px;">
+      AES-256 — The Algorithm
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:32px;">
+      <div style="background:#fff;border:2px solid #e0e0e0;border-radius:12px;padding:28px;border-top:5px solid #0066ff;box-shadow:0 4px 20px rgba(0,0,0,0.07);">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:3rem;color:#0066ff;line-height:1;">AES</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#888;letter-spacing:2px;margin-bottom:12px;">FULL NAME</div>
+        <p style="font-size:1rem;color:#444;line-height:1.7;font-weight:500;">
+          Advanced Encryption Standard. Created by the US government in 2001. Used worldwide as the gold standard for encryption.
+        </p>
+      </div>
+      <div style="background:#fff;border:2px solid #e0e0e0;border-radius:12px;padding:28px;border-top:5px solid #00b86b;box-shadow:0 4px 20px rgba(0,0,0,0.07);">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:3rem;color:#00b86b;line-height:1;">256</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#888;letter-spacing:2px;margin-bottom:12px;">KEY SIZE (BITS)</div>
+        <p style="font-size:1rem;color:#444;line-height:1.7;font-weight:500;">
+          The key is 256 bits long — that is 32 bytes. There are 2²⁵⁶ possible keys. A supercomputer would take longer than the age of the universe to guess it.
+        </p>
+      </div>
+      <div style="background:#fff;border:2px solid #e0e0e0;border-radius:12px;padding:28px;border-top:5px solid #ff6b00;box-shadow:0 4px 20px rgba(0,0,0,0.07);">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:3rem;color:#ff6b00;line-height:1;">GCM</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#888;letter-spacing:2px;margin-bottom:12px;">MODE</div>
+        <p style="font-size:1rem;color:#444;line-height:1.7;font-weight:500;">
+          Galois/Counter Mode. Not only encrypts the data but also creates a tag to verify the data was not tampered with during storage or transfer.
+        </p>
+      </div>
+    </div>
+
+    <!-- Key size comparison -->
+    <div style="background:#0a0a0a;border-radius:12px;padding:32px;color:#fff;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;color:#aaa;margin-bottom:20px;">Key Strength Comparison</div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.9rem;color:#888;width:80px;">64-bit</div>
+          <div style="flex:1;background:#333;border-radius:100px;height:14px;overflow:hidden;">
+            <div style="background:#e8002d;height:100%;width:8%;border-radius:100px;"></div>
+          </div>
+          <div style="font-size:0.9rem;color:#888;width:180px;">Old ATM cards</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.9rem;color:#888;width:80px;">128-bit</div>
+          <div style="flex:1;background:#333;border-radius:100px;height:14px;overflow:hidden;">
+            <div style="background:#ff6b00;height:100%;width:40%;border-radius:100px;"></div>
+          </div>
+          <div style="font-size:0.9rem;color:#888;width:180px;">Standard SSL/TLS</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.9rem;color:#00b86b;width:80px;font-weight:700;">256-bit</div>
+          <div style="flex:1;background:#333;border-radius:100px;height:14px;overflow:hidden;">
+            <div style="background:#00b86b;height:100%;width:100%;border-radius:100px;"></div>
+          </div>
+          <div style="font-size:0.9rem;color:#00b86b;width:180px;font-weight:700;">WhatsApp ← You are here</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── HOW WHATSAPP USES IT ── -->
+  <section>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3px;border-left:6px solid #ff6b00;padding-left:20px;margin-bottom:32px;">
+      How WhatsApp Uses AES-256
+    </div>
+
+    <!-- Step flow -->
+    <div style="display:flex;flex-direction:column;gap:4px;">
+
+      <!-- Step 1 -->
+      <div style="display:flex;gap:0;align-items:stretch;">
+        <div style="display:flex;flex-direction:column;align-items:center;width:64px;flex-shrink:0;">
+          <div style="width:48px;height:48px;border-radius:50%;background:#0066ff;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:#fff;flex-shrink:0;">1</div>
+          <div style="width:2px;background:#e0e0e0;flex:1;margin:4px 0;"></div>
+        </div>
+        <div style="background:#fff;border:2px solid #e0e0e0;border-radius:12px;padding:24px 28px;margin-bottom:8px;flex:1;box-shadow:0 2px 12px rgba(0,0,0,0.05);">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;margin-bottom:8px;">You Send a Message</div>
+          <p style="font-size:1rem;color:#555;line-height:1.7;font-weight:500;">You type "Hey!" and press send in WhatsApp. Before it leaves your device, WhatsApp immediately begins the encryption process.</p>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.9rem;background:#f4f4f4;padding:10px 16px;border-radius:6px;margin-top:12px;color:#0066ff;">Plaintext: "Hey!"</div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div style="display:flex;gap:0;align-items:stretch;">
+        <div style="display:flex;flex-direction:column;align-items:center;width:64px;flex-shrink:0;">
+          <div style="width:48px;height:48px;border-radius:50%;background:#00b86b;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:#fff;flex-shrink:0;">2</div>
+          <div style="width:2px;background:#e0e0e0;flex:1;margin:4px 0;"></div>
+        </div>
+        <div style="background:#fff;border:2px solid #e0e0e0;border-radius:12px;padding:24px 28px;margin-bottom:8px;flex:1;box-shadow:0 2px 12px rgba(0,0,0,0.05);">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;margin-bottom:8px;">Secret Key is Used</div>
+          <p style="font-size:1rem;color:#555;line-height:1.7;font-weight:500;">A unique 256-bit (32-byte) AES key is stored on your device. This key was generated when you first installed WhatsApp and is stored deep inside the phone at a protected location.</p>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;background:#f0fff8;padding:10px 16px;border-radius:6px;margin-top:12px;color:#00b86b;word-break:break-all;">Key: cd788b1b4625f50d3fccdeac94e1ff638899733b77a224ff614918363901f044</div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div style="display:flex;gap:0;align-items:stretch;">
+        <div style="display:flex;flex-direction:column;align-items:center;width:64px;flex-shrink:0;">
+          <div style="width:48px;height:48px;border-radius:50%;background:#ff6b00;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:#fff;flex-shrink:0;">3</div>
+          <div style="width:2px;background:#e0e0e0;flex:1;margin:4px 0;"></div>
+        </div>
+        <div style="background:#fff;border:2px solid #e0e0e0;border-radius:12px;padding:24px 28px;margin-bottom:8px;flex:1;box-shadow:0 2px 12px rgba(0,0,0,0.05);">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;margin-bottom:8px;">IV (Initialization Vector) Added</div>
+          <p style="font-size:1rem;color:#555;line-height:1.7;font-weight:500;">A random 16-byte IV is generated for each encryption. Even if you send the same message twice, the encrypted output will be completely different each time — making it impossible to guess patterns.</p>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;background:#fff8f0;padding:10px 16px;border-radius:6px;margin-top:12px;color:#ff6b00;word-break:break-all;">IV: ea53ceae36ecab50bc331aeb62491625</div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div style="display:flex;gap:0;align-items:stretch;">
+        <div style="display:flex;flex-direction:column;align-items:center;width:64px;flex-shrink:0;">
+          <div style="width:48px;height:48px;border-radius:50%;background:#e8002d;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:#fff;flex-shrink:0;">4</div>
+          <div style="width:2px;background:#e0e0e0;flex:1;margin:4px 0;"></div>
+        </div>
+        <div style="background:#fff;border:2px solid #e0e0e0;border-radius:12px;padding:24px 28px;margin-bottom:8px;flex:1;box-shadow:0 2px 12px rgba(0,0,0,0.05);">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;margin-bottom:8px;">Message is Encrypted → Saved as .crypt14</div>
+          <p style="font-size:1rem;color:#555;line-height:1.7;font-weight:500;">AES-256-GCM combines the key + IV + message to produce ciphertext. The database is saved on your phone as <code style="background:#f4f4f4;padding:2px 8px;border-radius:4px;font-family:'JetBrains Mono',monospace;">msgstore.db.crypt14</code></p>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;background:#fff0f3;padding:10px 16px;border-radius:6px;margin-top:12px;color:#e8002d;word-break:break-all;">Ciphertext: 7f3a9c1d4e8b2f0a5c7d9e3f1a4b6c8d...</div>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div style="display:flex;gap:0;align-items:stretch;">
+        <div style="display:flex;flex-direction:column;align-items:center;width:64px;flex-shrink:0;">
+          <div style="width:48px;height:48px;border-radius:50%;background:#0a0a0a;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:#fff;flex-shrink:0;">5</div>
+        </div>
+        <div style="background:#0a0a0a;border-radius:12px;padding:24px 28px;flex:1;box-shadow:0 2px 12px rgba(0,0,0,0.1);">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;margin-bottom:8px;color:#00b86b;">Forensic Investigator Decrypts</div>
+          <p style="font-size:1rem;color:#aaa;line-height:1.7;font-weight:500;">Our Python tool reads the key file, extracts the IV from the database header, and runs AES-256-GCM decryption to recover the original SQLite database — revealing all messages as evidence.</p>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:0.85rem;background:#111;padding:12px 16px;border-radius:6px;margin-top:12px;color:#00b86b;line-height:2;">
+            cipher = AES.new(key, AES.MODE_GCM, nonce=iv)<br/>
+            decrypted = cipher.decrypt(ciphertext)<br/>
+            <span style="color:#888"># Result: valid SQLite database ✅</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── KEY TERMS ── -->
+  <section>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3px;border-left:6px solid #0a0a0a;padding-left:20px;margin-bottom:32px;">
+      Key Cryptography Terms
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;">
+
+      <div style="background:#fff;border:2px solid #e0e0e0;border-radius:10px;padding:24px;display:flex;gap:20px;align-items:flex-start;">
+        <div style="font-size:2rem;flex-shrink:0;">🔑</div>
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;margin-bottom:8px;">Encryption Key</div>
+          <p style="font-size:0.95rem;color:#555;line-height:1.7;">A secret 32-byte (256-bit) random number used to lock and unlock the database. Without this key, the crypt14 file is completely unreadable.</p>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:2px solid #e0e0e0;border-radius:10px;padding:24px;display:flex;gap:20px;align-items:flex-start;">
+        <div style="font-size:2rem;flex-shrink:0;">🎲</div>
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;margin-bottom:8px;">IV — Initialization Vector</div>
+          <p style="font-size:0.95rem;color:#555;line-height:1.7;">A random 16-byte value added to encryption to ensure the same message always produces different ciphertext. Stored in the database header.</p>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:2px solid #e0e0e0;border-radius:10px;padding:24px;display:flex;gap:20px;align-items:flex-start;">
+        <div style="font-size:2rem;flex-shrink:0;">🏷️</div>
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;margin-bottom:8px;">GCM Authentication Tag</div>
+          <p style="font-size:0.95rem;color:#555;line-height:1.7;">A 16-byte digital fingerprint attached to the encrypted data. If anyone modifies even one byte of the database, the tag becomes invalid — proving tampering.</p>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:2px solid #e0e0e0;border-radius:10px;padding:24px;display:flex;gap:20px;align-items:flex-start;">
+        <div style="font-size:2rem;flex-shrink:0;">🔏</div>
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;margin-bottom:8px;">SHA-256 Hash</div>
+          <p style="font-size:0.95rem;color:#555;line-height:1.7;">A one-way fingerprint of a file. Used in our project for Chain of Custody — if the file changes even 1 bit, the hash changes completely, proving the evidence is authentic.</p>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:2px solid #e0e0e0;border-radius:10px;padding:24px;display:flex;gap:20px;align-items:flex-start;">
+        <div style="font-size:2rem;flex-shrink:0;">🗄️</div>
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;margin-bottom:8px;">SQLite Database</div>
+          <p style="font-size:0.95rem;color:#555;line-height:1.7;">After decryption, the .crypt14 file becomes a standard SQLite database — like an Excel file for apps. Contains tables with all messages, contacts, and media references.</p>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:2px solid #e0e0e0;border-radius:10px;padding:24px;display:flex;gap:20px;align-items:flex-start;">
+        <div style="font-size:2rem;flex-shrink:0;">📱</div>
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;margin-bottom:8px;">.crypt14 Format</div>
+          <p style="font-size:0.95rem;color:#555;line-height:1.7;">WhatsApp's proprietary encrypted backup format. The "14" means version 14 of their encryption. Contains a protobuf header, IV, ciphertext, and GCM authentication tag.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── WHY IT MATTERS FOR FORENSICS ── -->
+  <section>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3px;border-left:6px solid #e8002d;padding-left:20px;margin-bottom:32px;">
+      Why This Matters for Forensics
+    </div>
+    <div style="background:#0a0a0a;border-radius:16px;padding:48px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px;">
+      <div style="text-align:center;">
+        <div style="font-size:3rem;margin-bottom:16px;">🔓</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;color:#fff;margin-bottom:12px;">Legal Evidence</div>
+        <p style="font-size:0.95rem;color:#888;line-height:1.7;">Decrypted messages with SHA-256 hashes can be submitted as verified digital evidence in legal proceedings.</p>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:3rem;margin-bottom:16px;">🛡️</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;color:#fff;margin-bottom:12px;">Tamper Detection</div>
+        <p style="font-size:0.95rem;color:#888;line-height:1.7;">The GCM authentication tag proves the database has not been modified since it was created on the device.</p>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:3rem;margin-bottom:16px;">⏱️</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;color:#fff;margin-bottom:12px;">Timeline Analysis</div>
+        <p style="font-size:0.95rem;color:#888;line-height:1.7;">Every message has a Unix timestamp. Investigators can reconstruct a complete communication timeline for any case.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── BACK BUTTON ── -->
+  <div style="text-align:center;padding-bottom:32px;">
+    <a href="dashboard.html" style="
+      display:inline-block;
+      background:#0a0a0a; color:#fff;
+      font-family:'Bebas Neue',sans-serif;
+      font-size:1.4rem; letter-spacing:3px;
+      padding:20px 48px; border-radius:8px;
+      text-decoration:none;
+      transition:background 0.2s;
+    ">← Back to Dashboard</a>
+  </div>
+
+</main>
+
+</body>
+</html>
